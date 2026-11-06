@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -24,8 +27,28 @@ jobs:
       - name: Bauen
         run: gradle setupCIWorkspace build --no-daemon --stacktrace
 
+      - name: Jar prüfen
+        run: |
+          JAR=$(ls build/libs/*.jar | grep -v sources | head -1)
+          echo "JAR=$JAR" >> "$GITHUB_ENV"
+          unzip -l "$JAR"
+          # Reobfuskiert = SRG-Namen (func_/field_) in den Klassen
+          SRG=$(unzip -p "$JAR" dev/fluffitex/ocstudio/gui/ThemeEditorScreen.class | strings -a | grep -cE 'func_[0-9]+_|field_[0-9]+_' || true)
+          echo "SRG_REFS=$SRG" >> "$GITHUB_ENV"
+          echo "SRG-Referenzen in ThemeEditorScreen: $SRG"
+
       - uses: actions/upload-artifact@v4
         with:
           name: ocstudio-jar
           path: build/libs/*.jar
           if-no-files-found: error
+
+      - name: Release mit direkter Jar zum Herunterladen
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${{ github.run_number }}" "$JAR" \
+            --target "${{ github.sha }}" \
+            --title "ocstudio Build ${{ github.run_number }}" \
+            --notes "Jar fuer Forge 1.8.9. SRG-Referenzen in ThemeEditorScreen: ${SRG_REFS} (groesser 0 = reobfuskiert, laeuft im normalen Client)."
