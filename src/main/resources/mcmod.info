@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "ocstudio",
+    "name": "OneConfig Studio",
+    "description": "Passwortgeschützter Ingame-Editor für das Design der OneConfig-UI (Farben, Layout, Schrift, Animationen).",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "authorList": ["Fluffitex"],
+    "credits": "",
+    "url": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

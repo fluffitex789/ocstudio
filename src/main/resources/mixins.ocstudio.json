@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.7.11",
+  "package": "dev.fluffitex.ocstudio.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [],
+  "client": []
+}
